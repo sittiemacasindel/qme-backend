@@ -1,6 +1,8 @@
 package com.qme.qmeapp.user;
 
+import com.qme.qmeapp.common.exception.BadRequestException;
 import com.qme.qmeapp.common.exception.ResourceNotFoundException;
+import com.qme.qmeapp.user.dto.ChangePasswordRequest;
 import com.qme.qmeapp.user.dto.UpdateProfileRequest;
 import com.qme.qmeapp.user.dto.UserProfileResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class UserService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .organization(user.getOrganization())
                 .build();
     }
 
@@ -34,8 +37,8 @@ public class UserService {
             user.setName(request.getName());
         }
 
-        if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        if (request.getOrganization() != null) {
+            user.setOrganization(request.getOrganization());
         }
 
         userRepository.save(user);
@@ -45,6 +48,19 @@ public class UserService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .organization(user.getOrganization())
                 .build();
+    }
+
+    public void changePassword(String email, ChangePasswordRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
+            throw new BadRequestException("Current password is incorrect.");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }

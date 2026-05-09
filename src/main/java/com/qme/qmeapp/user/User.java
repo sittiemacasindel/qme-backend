@@ -31,6 +31,9 @@ public class User {
     @Column(nullable = false)
     private String role; // ADMIN or CUSTOMER
 
+    @Column
+    private String organization;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;

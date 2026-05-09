@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class UpdateProfileRequest {
     private String name;
-    private String password;
+    private String organization;
 }

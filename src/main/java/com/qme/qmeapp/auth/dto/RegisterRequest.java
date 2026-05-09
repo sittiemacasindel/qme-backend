@@ -23,4 +23,6 @@ public class RegisterRequest {
     @NotBlank(message = "Role is required")
     @Pattern(regexp = "ADMIN|CUSTOMER", message = "Role must be ADMIN or CUSTOMER")
     private String role;
+
+    private String organization;
 }

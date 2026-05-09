@@ -1,8 +1,10 @@
 package com.qme.qmeapp.user;
 
 import com.qme.qmeapp.common.dto.ApiResponse;
+import com.qme.qmeapp.user.dto.ChangePasswordRequest;
 import com.qme.qmeapp.user.dto.UpdateProfileRequest;
 import com.qme.qmeapp.user.dto.UserProfileResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -30,4 +32,14 @@ public class UserController {
         UserProfileResponse updatedProfile = userService.updateProfile(email, request);
         return ResponseEntity.ok(ApiResponse.success("Profile updated successfully", updatedProfile));
     }
+
+    @PutMapping("/me/password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            Authentication authentication,
+            @Valid @RequestBody ChangePasswordRequest request) {
+        String email = authentication.getName();
+        userService.changePassword(email, request);
+        return ResponseEntity.ok(ApiResponse.success("Password changed successfully", null));
+    }
 }
+

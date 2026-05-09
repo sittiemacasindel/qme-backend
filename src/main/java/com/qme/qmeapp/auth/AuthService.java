@@ -26,8 +26,10 @@ public class AuthService {
     private final CustomUserDetailsService userDetailsService;
 
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new BadRequestException("Email is already in use.");
+        // Block only if an ADMIN account already exists with this email.
+        // A CUSTOMER may share the same email — they get a separate ADMIN account.
+        if (userRepository.existsByEmailAndRole(request.getEmail(), "ADMIN")) {
+            throw new BadRequestException("An admin account with this email already exists.");
         }
 
         User user = User.builder()
@@ -35,6 +37,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
+                .organization(request.getOrganization())
                 .build();
 
         userRepository.save(user);
@@ -49,6 +52,7 @@ public class AuthService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .organization(user.getOrganization())
                 .build();
     }
 
@@ -70,6 +74,7 @@ public class AuthService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .organization(user.getOrganization())
                 .build();
     }
 }
